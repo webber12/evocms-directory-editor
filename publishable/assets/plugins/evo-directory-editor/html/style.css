@@ -1,0 +1,20 @@
+.directory-list .editable{cursor:pointer;position:relative;}
+.directory-list .directory_editor_wrapper{position:absolute;top:30px;left:0;
+    min-width:250px;text-align:left;
+    z-index:5;background:#ffffff;padding:10px;
+    -webkit-box-shadow: 1px -2px 14px 3px rgba(34, 60, 80, 0.2);
+    -moz-box-shadow: 1px -2px 14px 3px rgba(34, 60, 80, 0.2);
+    box-shadow: 1px -2px 14px 3px rgba(34, 60, 80, 0.2);
+}
+
+.directory-list .directory_editor_wrapper.editor_type_image{min-width:300px;}
+.directory-list .directory_editor_wrapper.editor_type_file{min-width:300px;}
+.directory-list .directory_editor_buttons{padding-top:10px;text-align:left;white-space:nowrap;}
+
+.directory_editor_wrapper .image_for_field{
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width:64px;height:64px;transition:0.3s;
+}
+.directory_editor_wrapper .image_for_field:hover{transform:scale(1.5);transform-origin: center left;position:relative;z-index:2;}
