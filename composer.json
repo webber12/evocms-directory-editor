@@ -1,0 +1,16 @@
+{
+    "name": "webber12/evocms-directory-editor",
+    "description": "Plugin for Directory for evocms 3.x",
+    "autoload": {
+        "psr-4": {
+            "EvolutionCMS\\EvoDirectoryEditor\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "EvolutionCMS\\EvoDirectoryEditor\\EvoDirectoryEditorServiceProvider"
+            ]
+        }
+    }
+}
