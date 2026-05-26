@@ -78,8 +78,8 @@ class EvoDirectoryEditorController
                         $renderedValue = [];
                         foreach(explode('||', $data['value']) as $value) {
                             $renderedValue[] = $elements[$value] ?? $value;
-                            $data['renderedValue'] = implode(', ', $renderedValue);
                         }
+                        $data['renderedValue'] = implode(', ', $renderedValue);
                     } else {
                         if(in_array($tv->type, [ 'checkbox', 'listbox-multiple' ])) {
                             $data['renderedValue'] = str_replace('||', ', ', $data['value']);
