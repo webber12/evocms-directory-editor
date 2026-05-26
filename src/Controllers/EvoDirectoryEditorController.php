@@ -32,16 +32,19 @@ class EvoDirectoryEditorController
         $doc = new modResource( evo() );
         $doc->edit($id);
         $doc->fromArray( [ $fieldName => $fieldValue ] );
-        $res = $doc->save();
+        $res = $doc->save(true, true);
         $data = [
             'id' => $id,
             'field' => $fieldName,
             'value' => $fieldValue,
             'res' => $res,
         ];
-        $model = SiteContent::find($id);
-        $data = $this->renderValue($data, $model);
-        return [ 'status' => 'success', 'data' => $data, 'editor' => $this->parseEditorForm($id, $fieldName, $fieldValue) ];
+        $doc->edit($id);
+        $realValue = $doc->get($fieldName);
+        $realValue = (string)(is_array($realValue) ? implode('||', $realValue) : $realValue);
+        $data['value'] = $realValue;
+        $data = $this->renderValue($data, SiteContent::find($id) );
+        return [ 'status' => 'success', 'data' => $data, 'editor' => $this->parseEditorForm($id, $fieldName, $realValue) ];
     }
 
 

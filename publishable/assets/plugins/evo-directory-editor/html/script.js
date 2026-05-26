@@ -33,7 +33,10 @@ jQuery(document).ready(function ($) {
         },
         bindCeilAction: function () {
             let self = this;
-            $(document).on("dblclick", ".directory-list .editable", function (e) {
+            $(document).on("click", ".directory-list .editable", function (e) {
+
+                if ($(e.target).closest('.directory_editor_wrapper').length) return;
+
                 if ($(this).hasClass("in_proccess")) {
                     $(this).find(".directory_editor_wrapper").hide(150, function () {
                         $(this).remove();
@@ -67,12 +70,13 @@ jQuery(document).ready(function ($) {
             }
         },
         saveValueSuccess: function (element, data, msg) {
-            console.log(msg);
+            //console.log(msg);
             let value = msg.data.renderedValue || msg.data.value;
             if(typeof value != "undefined") {
                 let ceil = element.closest(".editable.in_proccess");
                 ceil.html(value);
-                ceil.append(msg.editor);
+                ceil.removeClass("in_proccess");
+                //ceil.append(msg.editor);
             }
         },
         sendRequest: function (url, element, data, add = {}) {
