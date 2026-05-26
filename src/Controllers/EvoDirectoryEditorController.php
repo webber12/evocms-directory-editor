@@ -19,7 +19,6 @@ class EvoDirectoryEditorController
     public function ajaxSaveValue()
     {
         $params = $this->getValuesFromRequest();
-        $this->log($params, 'params');
         $id = $this->getFromRequest('id', 'int');
         $tv_id = $this->getFromRequest('tv_id', 'int');
 
