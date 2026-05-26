@@ -2,6 +2,7 @@
     <form method="post" onsubmit="return false;">
         <input type="hidden" name="action" value="saveValue">
         <input type="hidden" name="id" value="{{ $id }}">
+        <input type="hidden" name="tv_id" value="{{ $tvId ?? '' }}">
 
         {!! $rows !!}
 

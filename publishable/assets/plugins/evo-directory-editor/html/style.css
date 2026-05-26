@@ -1,4 +1,17 @@
 .directory-list .editable{cursor:pointer;position:relative;}
+.directory-list .editable:before{content:"\f044";font-family:"Font Awesome 5 Free";
+    position:absolute;top:3px;right:3px;z-index:2;font-size:8px;
+    opacity:0;transition:0.3s;
+}
+.directory-list .editable:hover{
+    background: #fefefe;
+}
+.directory-list .editable:hover:before{
+    opacity:0.8;
+}
+.directory-list .editable.in_progress:before{
+    opacity:0.8;
+}
 .directory-list .directory_editor_wrapper{position:absolute;top:30px;left:0;
     min-width:250px;text-align:left;
     z-index:5;background:#ffffff;padding:10px;

@@ -18,16 +18,23 @@ class EvoDirectoryEditorController
 
     public function ajaxSaveValue()
     {
-        $save = [];
         $params = $this->getValuesFromRequest();
+        $this->log($params, 'params');
         $id = $this->getFromRequest('id', 'int');
+        $tv_id = $this->getFromRequest('tv_id', 'int');
 
-        if(empty($id) || empty($params) || count($params) != 2) {
+        if(empty($id) || (empty($tv_id) && empty($params))) {
             return [ 'status' => 'error', 'message' => 'invalid data' ];
         }
 
-        $fieldName = $params[0];
-        $fieldValue = $params[1];
+        if(!empty($tv_id) && (empty($params) || count($params) < 2)) {
+            $fieldValue = '';
+            $fieldName = SiteTmplvar::find($tv_id)->name;
+        } else {
+            $fieldName = $params[0];
+            $fieldValue = $params[1];
+        }
+
         $fieldValue = $this->prepareValueBeforeSave($fieldValue, $fieldName);
         $doc = new modResource( evo() );
         $doc->edit($id);
@@ -128,9 +135,11 @@ class EvoDirectoryEditorController
         $html = '';
         $isTv = $this->isTv($field);
         $fieldType = 'text';
+        $tvId = 0;
         if($isTv) {
             $res = SiteTmplvar::where('name', $field)->first()->toArray();
             $row = $this->convertObjToArray($res);
+            $tvId = $row['id'];
             if(is_array($value)) {
                 $value = implode('||', $value); //fix for listbox-multiple
             }
@@ -161,7 +170,11 @@ class EvoDirectoryEditorController
             }
         }
         if(!empty($rows)) {
-            $html = $this->render('wrapper', [ 'rows' => $rows, 'id' => $id, 'fieldType' => $fieldType ]);
+            $html = $this->render('wrapper', [ 'rows' => $rows,
+                'id' => $id,
+                'fieldType' => $fieldType,
+                'tvId' => $tvId
+            ]);
         }
         return $html;
     }
