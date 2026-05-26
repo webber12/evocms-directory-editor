@@ -68,18 +68,39 @@ class EvoDirectoryEditorController
                 $data['renderedValue'] = $renderer($data['value'], $model, $config);
             }
         } else {
-            //default behavior for multiple tv elements
-            if(strpos($data['value'], '||') !== false && $this->isTv($data['field'])) {
+            //default behavior for tv with elements
+            if($this->isTv($data['field'])) {
                 $tv = SiteTmplvar::where('name', $data['field']);
                 if($tv->count() > 0) {
-                    $type = $tv->first()->type;
-                    if(in_array($type, [ 'checkbox', 'listbox-multiple' ])) {
-                        $data['renderedValue'] = str_replace('||', ', ', $data['value']);
+                    $tv = $tv->first();
+                    $elements = $this->getTvElements($tv->elements);
+                    if(!empty($elements)) {
+                        $renderedValue = [];
+                        foreach(explode('||', $data['value']) as $value) {
+                            $renderedValue[] = $elements[$value] ?? $value;
+                            $data['renderedValue'] = implode(', ', $renderedValue);
+                        }
+                    } else {
+                        if(in_array($tv->type, [ 'checkbox', 'listbox-multiple' ])) {
+                            $data['renderedValue'] = str_replace('||', ', ', $data['value']);
+                        }
                     }
                 }
             }
         }
         return $data;
+    }
+
+    protected function getTvElements($elements) {
+
+        $arr = [];
+        $tmp = ParseIntputOptions(ProcessTVCommand($elements, '', '', 'tvform'));
+        foreach($tmp as $row) {
+            $tmp2 = explode('==', $row);
+            $key = $tmp2[1] ?? $tmp2[0];
+            $arr[$key] = $tmp2[0];
+        }
+        return $arr;
     }
 
     protected function loadDirectoryConfig($parent)
