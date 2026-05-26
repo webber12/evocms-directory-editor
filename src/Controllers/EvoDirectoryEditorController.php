@@ -5,7 +5,7 @@ use Pathologic\EvolutionCMS\MODxAPI\modResource;
 use EvolutionCMS\Models\SiteContent;
 use Illuminate\Support\Facades\Schema;
 
-class EvoDirectoryController
+class EvoDirectoryEditorController
 {
 
     use \EvolutionCMS\EvoDirectoryEditor\Traits\Render;
@@ -33,13 +33,15 @@ class EvoDirectoryController
         $doc->edit($id);
         $doc->fromArray( [ $fieldName => $fieldValue ] );
         $res = $doc->save();
-        $save[] = [
+        $data = [
             'id' => $id,
             'field' => $fieldName,
             'value' => $fieldValue,
             'res' => $res,
         ];
-        return [ 'status' => 'success', 'request' => $this->request, 'save' => $save ];
+        $model = SiteContent::find($id);
+        $data = $this->renderValue($data, $model);
+        return [ 'status' => 'success', 'data' => $data, 'editor' => $this->parseEditorForm($id, $fieldName, $fieldValue) ];
     }
 
 
@@ -56,6 +58,41 @@ class EvoDirectoryController
 
     }
 
+    protected function renderValue($data, SiteContent $model)
+    {
+        $config = $this->loadDirectoryConfig($model->parent);
+        $config['id'] = $model->parent;
+        if(!empty($config['columns'][ $data['field'] ]['renderer'])) {
+            $renderer = $config['columns'][ $data['field'] ]['renderer'];
+            if(is_callable($renderer)) {
+                $data['renderedValue'] = $renderer($data['value'], $model, $config);
+            }
+        } else {
+            //default behavior for multiple tv elements
+            if(strpos($data['value'], '||') !== false && $this->isTv($data['field'])) {
+                $tv = SiteTmplvar::where('name', $data['field']);
+                if($tv->count() > 0) {
+                    $type = $tv->first()->type;
+                    if(in_array($type, [ 'checkbox', 'listbox-multiple' ])) {
+                        $data['renderedValue'] = str_replace('||', ', ', $data['value']);
+                    }
+                }
+            }
+        }
+        return $data;
+    }
+
+    protected function loadDirectoryConfig($parent)
+    {
+        foreach(glob(EVO_CORE_PATH . 'custom/directory/*.php') as $file) {
+            $config = include($file);
+            if(!empty($config['ids']) && in_array($parent, $config['ids'])) {
+                return $config;
+            }
+        }
+
+        return true;
+    }
 
     protected function convertObjToArray($obj)
     {
@@ -70,6 +107,9 @@ class EvoDirectoryController
         if($isTv) {
             $res = SiteTmplvar::where('name', $field)->first()->toArray();
             $row = $this->convertObjToArray($res);
+            if(is_array($value)) {
+                $value = implode('||', $value); //fix for listbox-multiple
+            }
             $fieldType = stripos($row['type'], 'custom_tv') === false ? $row['type'] : 'text';
             $rows = renderFormElement(
                 $fieldType,
@@ -85,6 +125,7 @@ class EvoDirectoryController
             );
             $rows = str_replace('onchange="documentDirty=true;"', ' ', $rows);
         }
+
         if (empty($rows)) {
             $rows = '';
             if (is_scalar($value)) {
@@ -113,9 +154,7 @@ class EvoDirectoryController
             $tvType = $this->getTvType($field);
             switch($tvType) {
                 case 'checkbox':
-                case 'radio':
-                case 'dropdown':
-                case 'multiselect':
+                case 'listbox-multiple':
                     if(is_array($value)) {
                         $value = implode('||', $value);
                     }

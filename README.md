@@ -19,3 +19,24 @@
 Редактирование происходит по dblclick
 
 
+##### Важно
+
+Поскольку поле pagetitle использует собственный renderer, то при необходимости его редактирования необходимо в конфигурации
+заменить на следующий (либо модифицировать под свои нужды)
+
+```
+'renderer' => function($value, $row, $config) {
+    if ($row->isfolder) {
+        return '
+            <i class="fa fa-folder"></i> ' .
+            '<a href="modules/' . md5('Directory') . '/show/' . $row->parent . '/' . $row->id .  '">' . $row->pagetitle . '</a>';
+        } else {
+            return '
+                <i class="fa fa-edit"></i> 
+                <a href="index.php?a=27&amp;id=' . $row->id . '" title="Редактировать документ" target="main">' . $row->pagetitle . '</a>
+            ';
+    }
+},
+```
+
+

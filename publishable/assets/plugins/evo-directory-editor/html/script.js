@@ -67,7 +67,13 @@ jQuery(document).ready(function ($) {
             }
         },
         saveValueSuccess: function (element, data, msg) {
-            location.reload();
+            console.log(msg);
+            let value = msg.data.renderedValue || msg.data.value;
+            if(typeof value != "undefined") {
+                let ceil = element.closest(".editable.in_proccess");
+                ceil.html(value);
+                ceil.append(msg.editor);
+            }
         },
         sendRequest: function (url, element, data, add = {}) {
             let self = this;
